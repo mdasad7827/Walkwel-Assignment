@@ -6,14 +6,10 @@ import {
   DropdownItem,
 } from "reactstrap";
 
-const DropdownGender = ({ genderArr, changeGender, gender, setGender }) => {
+const DropdownGender = ({ genderArr, changeGender, gender }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const toggle = () => setDropdownOpen((prevState) => !prevState);
-  const selectedGender = (val) => {
-    changeGender(val);
-    setGender(val);
-  };
 
   return (
     <Dropdown isOpen={dropdownOpen} toggle={toggle}>
@@ -21,7 +17,7 @@ const DropdownGender = ({ genderArr, changeGender, gender, setGender }) => {
       <DropdownMenu>
         {genderArr.map((item, idx) => {
           return (
-            <DropdownItem key={idx} onClick={() => selectedGender(item)}>
+            <DropdownItem key={idx} onClick={() => changeGender(item)}>
               {item}
             </DropdownItem>
           );

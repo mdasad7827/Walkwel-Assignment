@@ -6,15 +6,10 @@ import {
   DropdownItem,
 } from "reactstrap";
 
-const DropdownCity = ({ city, setCity, cityArr, changeCity }) => {
+const DropdownCity = ({ city, cityArr, changeCity }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const toggle = () => setDropdownOpen((prevState) => !prevState);
-
-  const selectedCity = (val) => {
-    changeCity(val);
-    setCity(val);
-  };
 
   return (
     <Dropdown isOpen={dropdownOpen} toggle={toggle}>
@@ -22,7 +17,7 @@ const DropdownCity = ({ city, setCity, cityArr, changeCity }) => {
       <DropdownMenu>
         {cityArr.map((item, idx) => {
           return (
-            <DropdownItem key={idx} onClick={() => selectedCity(item)}>
+            <DropdownItem key={idx} onClick={() => changeCity(item)}>
               {item}
             </DropdownItem>
           );

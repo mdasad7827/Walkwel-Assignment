@@ -14,7 +14,7 @@ export default function Search({ searchItem, reset }) {
   };
 
   return (
-    <InputGroup className="p-2 mt-5 w-75 ml-auto" size="md">
+    <InputGroup className="pt-5 w-75 m-auto mt-5" size="md">
       <Input
         placeholder="Search First Name, Last Name, Email"
         type="text"

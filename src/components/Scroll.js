@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import data from "./data.json";
 import { Col, Row, Table } from "reactstrap";
@@ -10,8 +10,7 @@ import DropdownGender from "./DropdownGender";
 function TableData() {
   const dataArr = data.data;
   const [arr, setArr] = useState([...dataArr]);
-  // console.log(arr);
-  const [iq, setIq] = useState("");
+  const [iq, setIq] = useState(0);
   const [genderArr, setGenderArr] = useState([]);
   const [gender, setGender] = useState("Gender");
   const [cityArr, setCityArr] = useState([]);
@@ -19,7 +18,7 @@ function TableData() {
 
   const [count, setCount] = useState({
     prev: 0,
-    next: 50,
+    next: 100,
   });
   const [hasMore, setHasMore] = useState(true);
   const [current, setCurrent] = useState(
@@ -28,30 +27,33 @@ function TableData() {
 
   useEffect(() => {
     let currIq = 0;
-    const length = current.length;
-    current.forEach((item) => {
+    const length = arr.length;
+    arr.forEach((item) => {
       currIq += item.iq;
     });
     const finalIq = (currIq / length).toFixed(2);
-    setIq(finalIq);
+    setIq(isNaN(finalIq) ? 0 : finalIq);
   }, [current]);
-  // console.log("curArr>", current);
+
   const getMoreData = () => {
     if (current.length >= arr.length) {
       setHasMore(false);
       return;
     }
 
-    setCurrent(current.concat(arr.slice(count.prev + 50, count.next + 50)));
+    setCurrent(
+      current.concat(...[arr.slice(count.prev + 100, count.next + 100)])
+    );
     setCount((prevState) => ({
-      prev: prevState.prev + 50,
-      next: prevState.next + 50,
+      prev: prevState.prev + 100,
+      next: prevState.next + 100,
     }));
   };
   const searchItem = (val) => {
+    console.log("searchItem ran");
     setCount({
       prev: 0,
-      next: 50,
+      next: 100,
     });
     const filteredArr = dataArr.filter(
       (data) =>
@@ -63,29 +65,29 @@ function TableData() {
   };
 
   useEffect(() => {
-    setCurrent(arr.slice(count.prev, count.next));
+    setCurrent(...[arr.slice(count.prev, count.next)]);
   }, [arr]);
 
   useEffect(() => {
-    const genderSet = new Set();
     current.forEach((item) => {
-      genderSet.add(item.gender);
+      if (!cityArr.includes(item.city)) {
+        cityArr.push(item.city);
+      }
     });
-    genderSet.forEach((i) => genderArr.push(i));
+    dataArr.forEach((item) => {
+      if (!genderArr.includes(item.gender)) {
+        genderArr.push(item.gender);
+      }
+    });
+
     setGenderArr([...genderArr]);
-    // console.log(genderArr);
-    const citySet = new Set();
-    current.forEach((item) => {
-      citySet.add(item.city);
-    });
-    citySet.forEach((i) => cityArr.push(i));
     setCityArr([...cityArr]);
-  }, []);
+  }, [current, dataArr]);
 
   const reset = () => {
     setCount({
       prev: 0,
-      next: 50,
+      next: 100,
     });
     setArr([...dataArr]);
     setHasMore(true);
@@ -95,11 +97,23 @@ function TableData() {
 
   const changeCity = (val) => {
     const filteredArr = dataArr.filter((data) => data.city === val);
+    setCount({
+      prev: 0,
+      next: 100,
+    });
+    setHasMore(true);
+    setCity(val);
     setArr(filteredArr);
   };
 
   const changeGender = (val) => {
     const filteredArr = dataArr.filter((data) => data.gender === val);
+    setCount({
+      prev: 0,
+      next: 100,
+    });
+    setHasMore(true);
+    setGender(val);
     setArr(filteredArr);
   };
 
@@ -117,7 +131,12 @@ function TableData() {
             hasMore={hasMore}
             loader={""}
           >
-            <Table striped size="sm">
+            <Table
+              striped
+              bordered
+              size="sm"
+              style={{ width: "90%", margin: "auto", backgroundColor: "white" }}
+            >
               <thead>
                 <tr>
                   <th>#</th>
@@ -129,7 +148,6 @@ function TableData() {
                   <th>
                     <DropdownCity
                       city={city}
-                      setCity={setCity}
                       cityArr={cityArr}
                       changeCity={changeCity}
                     />
@@ -137,7 +155,6 @@ function TableData() {
                   <th>
                     <DropdownGender
                       gender={gender}
-                      setGender={setGender}
                       genderArr={genderArr}
                       changeGender={changeGender}
                     />
